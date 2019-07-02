@@ -1,18 +1,39 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Vincent Palazzo vincenzopalazzodev@gmail.com
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package mdlaf.components.textfield;
 
+import mdlaf.utils.MaterialColors;
 import mdlaf.utils.MaterialDrawingUtils;
-import mdlaf.utils.MaterialFonts;
+import sun.java2d.SunGraphics2D;
 
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTextFieldUI;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -22,6 +43,7 @@ import java.beans.PropertyChangeListener;
 public class MaterialTextFieldUI extends BasicTextFieldUI implements FocusListener, PropertyChangeListener {
 
     private boolean drawLine;
+    private Color background;
     private Color activeBackground;
     private Color activeForeground;
     private Color inactiveBackground;
@@ -41,10 +63,6 @@ public class MaterialTextFieldUI extends BasicTextFieldUI implements FocusListen
     }
 
     @Override
-    /**
-     * This method not override because non paint correct in the JFileChooser
-     * @fixed by https://github.com/vincenzopalazzo
-     */
     public void installUI(JComponent c) {
         super.installUI(c);
 
@@ -76,6 +94,7 @@ public class MaterialTextFieldUI extends BasicTextFieldUI implements FocusListen
     }
 
     private void installMyDefaults() {
+        this.background = UIManager.getColor("TextField.background");
         this.activeBackground = UIManager.getColor("TextField.selectionBackground");
         this.activeForeground = UIManager.getColor("TextField.selectionForeground");
         this.inactiveBackground = UIManager.getColor("TextField.inactiveBackground");
@@ -87,11 +106,11 @@ public class MaterialTextFieldUI extends BasicTextFieldUI implements FocusListen
         getComponent().setForeground(getComponent().hasFocus() && getComponent().isEnabled() ? activeForeground : inactiveForeground);
         getComponent().setBorder(UIManager.getBorder("TextField.border"));
     }
+
     @Override
     protected void paintBackground(Graphics g) {
         super.paintBackground(MaterialDrawingUtils.getAliasedGraphics(g));
     }
-
 
     @Override
     public void focusGained(FocusEvent e) {
@@ -103,142 +122,91 @@ public class MaterialTextFieldUI extends BasicTextFieldUI implements FocusListen
         changeColorOnFocus(false);
     }
 
-    private void changeColorOnFocus(boolean hasFocus) {
-        JTextField c = (JTextField) getComponent();
-        if(c == null){
-            return;
-        }
-		/*c.setSelectionColor(hasFocus ? activeBackground : inactiveBackground);
-		c.setForeground(hasFocus ? activeForeground : inactiveForeground);
-		c.setSelectedTextColor(hasFocus ? activeForeground : inactiveForeground);*/
-        if(hasFocus && (activeBackground != null) && (activeForeground != null)){
-            c.setSelectionColor(activeBackground);
-            c.setForeground(activeForeground);
-            c.setSelectedTextColor(activeForeground);
-        }
-
-        if(!hasFocus && (inactiveBackground != null) && (inactiveForeground != null)){
-            c.setSelectionColor(inactiveBackground);
-            c.setForeground(inactiveForeground);
-            c.setSelectedTextColor(inactiveForeground);
-        }
-        if(c.getGraphics() != null){
-            c.paint(c.getGraphics());
-        }
-    }
-/*
-    @Override
-    protected void installKeyboardActions() {
-        super.installKeyboardActions();
-
-        Action selectAll = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(getComponent() != null){
-                    getComponent().selectAll();
-                }
-            }
-        };
-
-        Action delete = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (getComponent().getSelectedText() != null) {
-                    int pos = getComponent().getCaretPosition() - 1;
-
-                    if (pos >= 0) {
-                        getComponent().select(pos, pos + 1);
-                        getComponent().replaceSelection("");
-                    }
-                } else {
-                    getComponent().replaceSelection("");
-                }
-            }
-        };
-
-        Action left = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(getComponent() != null){
-                    getComponent().setCaretPosition(Math.max(0, getComponent().getCaretPosition() - 1));
-                }
-            }
-        };
-
-        Action right = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(getComponent() != null){
-                    getComponent().setCaretPosition(Math.min(getComponent().getText().length(), getComponent().getCaretPosition() + 1));
-                }
-            }
-        };
-
-        Action enter = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(getComponent() != null){
-                    ((JTextField) getComponent()).postActionEvent();
-                }
-            }
-        };
-
-        // note getMenuShortcutKeyMask() is deprecated in Java 10 - change to getMenuShortcutKeyMaskEx()
-        getComponent().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "selectAll");
-        getComponent().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "delete");
-        getComponent().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "left");
-        getComponent().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "right");
-        getComponent().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enter");
-
-        getComponent().getActionMap().put("selectAll", selectAll);
-        getComponent().getActionMap().put("delete", delete);
-        getComponent().getActionMap().put("left", left);
-        getComponent().getActionMap().put("right", right);
-        getComponent().getActionMap().put("enter", enter);
-    }
-*/
-    @Override
     /**
-     *This method drive a line button on JTextField
-     * @fixed by https://github.com/vincenzopalazzo
+     * Paint line when the component is focused
+     * @param g
      */
+    @Override
     public void paintSafely(Graphics g) {
-        JTextField c = (JTextField) getComponent();
         super.paintSafely(g);
-        if (drawLine) {
-            int x = c.getInsets().left;
-            int y = c.getInsets().top;
-            int w = c.getWidth() - c.getInsets().left - c.getInsets().right;
-            g.setColor(c.getSelectionColor());
 
-            g.fillRect(x, c.getHeight() - y, w, 1);
-        }
-
+        paintLine(MaterialColors.LIGHT_BLUE_400, g);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent pce) {
         super.propertyChange(pce);
-
+        if(getComponent() == null){
+            return;
+        }
         if (pce.getPropertyName().equals("selectionColor")) {
             Color newColor = (Color) pce.getNewValue();
-            if (!newColor.equals(activeBackground) && !newColor.equals(inactiveBackground)) {
-                this.activeBackground = newColor;
-                getComponent().repaint();
-            }
+            logicForPropertyChange(newColor, false);
         }
 
         if (pce.getPropertyName().equals("selectedTextColor")) {
             Color newColor = (Color) pce.getNewValue();
-            if (!newColor.equals(activeForeground) && !newColor.equals(inactiveForeground)) {
-                this.activeForeground = newColor;
-                getComponent().repaint();
-            }
+            logicForPropertyChange(newColor, true);
         }
         if (pce.getPropertyName().equals("background")) {
             getComponent().repaint();
         }
-
     }
 
+    protected void logicForChangeColorOnFocus(JComponent component, Color background, Color foreground){
+        if(background == null || foreground == null){
+            throw new IllegalArgumentException("Argument function null");
+        }
+        JTextField textField = (JTextField) component;
+        textField.setSelectionColor(background);
+        textField.setForeground(foreground);
+        textField.setSelectedTextColor(foreground);
+    }
+
+    protected void logicForPropertyChange(Color newColor, boolean isForeground){
+        if(newColor == null){
+            throw new IllegalArgumentException("The input argument is null");
+        }
+        if (isForeground && !newColor.equals(activeForeground) && !newColor.equals(inactiveForeground)) {
+            this.activeForeground = newColor;
+            getComponent().repaint();
+        }
+        if (!isForeground && !newColor.equals(activeBackground) && !newColor.equals(inactiveBackground)) {
+            this.activeBackground = newColor;
+            getComponent().repaint();
+        }
+    }
+
+    protected void changeColorOnFocus(boolean hasFocus) {
+        JTextField c = (JTextField) getComponent();
+        if(c == null){
+            return;
+        }
+        if(hasFocus && (activeBackground != null) && (activeForeground != null)){
+            logicForChangeColorOnFocus(c, activeBackground, activeForeground);
+        }
+
+        if(!hasFocus && (inactiveBackground != null) && (inactiveForeground != null)){
+            logicForChangeColorOnFocus(c, inactiveBackground, inactiveForeground);
+        }
+        if(c.getGraphics() != null){
+            c.paint(c.getGraphics());
+        }
+    }
+
+    protected void paintLine(Color color, Graphics graphics){
+        if(color == null || graphics == null){
+            throw new IllegalArgumentException("Color null");
+        }
+        JTextField c = (JTextField) getComponent();
+
+        if (drawLine) {
+            int x = c.getInsets().left;
+            int y = c.getInsets().top;
+            int w = c.getWidth() - c.getInsets().left - c.getInsets().right;
+            graphics.setColor(c.getSelectionColor());
+
+            graphics.fillRect(x, c.getHeight() - y, w, 1);
+        }
+    }
 }

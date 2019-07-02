@@ -1,7 +1,8 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 atharva washimkar, Vincent Palazzo
+ * Copyright (c) 2018-2019 atharva washimkar,
+ * Copyright (c) 2019 Vincent Palazzo vincenzopalazzodev@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +24,8 @@
  */
 package mdlaf;
 
+import mdlaf.components.rootpane.MaterialRootPaneUI;
+import mdlaf.components.internalframe.MaterialInternalFrameUI;
 import mdlaf.components.button.MaterialButtonUI;
 import mdlaf.components.checkbox.MaterialCheckBoxUI;
 import mdlaf.components.checkboxmenuitem.MaterialCheckBoxMenuItemUI;
@@ -46,6 +49,7 @@ import mdlaf.components.scrollbar.MaterialScrollBarUI;
 import mdlaf.components.separator.MaterialSeparatorUI;
 import mdlaf.components.slider.MaterialSliderUI;
 import mdlaf.components.spinner.MaterialSpinnerUI;
+import mdlaf.components.splitpane.MaterialSplitPaneUI;
 import mdlaf.components.tabbedpane.MaterialTabbedPaneUI;
 import mdlaf.components.table.MaterialTableHeaderUI;
 import mdlaf.components.table.MaterialTableUI;
@@ -57,8 +61,8 @@ import mdlaf.components.togglebutton.MaterialToggleButtonUI;
 import mdlaf.components.toolbar.MaterialToolBarUI;
 import mdlaf.components.tooltip.MaterialToolTipUI;
 import mdlaf.components.tree.MaterialTreeUI;
-import mdlaf.shadows.DropShadowBorder;
 import mdlaf.utils.*;
+import sun.awt.SunToolkit;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicLookAndFeel;
@@ -66,12 +70,12 @@ import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.lang.reflect.Method;
 
 /**
  * @contributor https://github.com/vincenzopalazzo
  */
-
 public class MaterialLookAndFeel extends MetalLookAndFeel {
 
     private BasicLookAndFeel basicLookAndFeel;
@@ -105,19 +109,22 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
     private static final String fileChooserUI = MaterialFileChooserUI.class.getCanonicalName();
     private static final String toolTipUI = MaterialToolTipUI.class.getCanonicalName();
     private static final String taskPaneUI = MaterialTaskPaneUI.class.getCanonicalName();
-    private static final String optionPaneUI = MaterialOptionPaneUI.class.getCanonicalName();
     private static final String formattedTextFieldUI = MaterialFormattedTextFieldUI.class.getCanonicalName();
     private static final String listUI = MaterialListUI.class.getCanonicalName();
-
+    private static final String internalFrameUI = MaterialInternalFrameUI.class.getCanonicalName();
     private static final String textAreaUI = MaterialTextAreaUI.class.getCanonicalName();
     private static final String editorPane = MaterialEditorPaneUI.class.getCanonicalName();
+    private static final String rootPane = MaterialRootPaneUI.class.getCanonicalName();
+    private static final String optionPaneUI = MaterialOptionPaneUI.class.getCanonicalName();
+    //TODO not allineated this compoent with master
+    private static final String splitPaneUI = MaterialSplitPaneUI.class.getCanonicalName();
 
     public MaterialLookAndFeel() {
         try {
             basicLookAndFeel = new MetalLookAndFeel();
             MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
         } catch (Exception ignore) {
-            //do nothing
+            ignore.printStackTrace();
         }
     }
 
@@ -182,12 +189,15 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
         table.put("SeparatorUI", separatorUI);
         table.put("FileChooserUI", fileChooserUI);
         table.put("ToolTipUI", toolTipUI);
-        //table.put("OptionPaneUI", optionPaneUI);
         table.put("FormattedTextFieldUI", formattedTextFieldUI);
         table.put("ListUI", listUI);
-
         table.put("TextAreaUI", textAreaUI);
         table.put("EditorPaneUI", editorPane);
+        table.put("InternalFrameUI", internalFrameUI);
+        table.put("RootPaneUI", rootPane);
+        table.put("OptionPaneUI", optionPaneUI);
+        table.put("SplitPaneUI", splitPaneUI);
+
         // java swingx
         table.put("swingx/TaskPaneUI", taskPaneUI);
     }
@@ -200,40 +210,47 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
         table.put("Button.opaque", false);
         table.put("Button.border", BorderFactory.createEmptyBorder(7, 17, 7, 17));
         table.put("Button.background", MaterialColors.GRAY_200);
+        table.put("Button[Default].background", MaterialColors.GRAY_400);
         table.put("Button.foreground", Color.BLACK);
-        table.put("Button.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.BOLD));
+        table.put("Button[Default].foreground", Color.BLACK);
+        table.put("Button.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.BOLD));
         table.put("Button.mouseHoverColor", MaterialColors.GRAY_500);
         table.put("Button.mouseHoverEnable", true);
-        table.put("Button.focusable", false);
-        //FUNCTION not implementable for moment
-        table.put("Button[focus].background", MaterialColors.GRAY_400);
-        table.put("Button[focus].foreground", MaterialColors.BLACK);
+        table.put("Button.focusable", true);
+        table.put("Button[focus].color", MaterialColors.GRAY_900);
+        table.put("Button.disabledText", MaterialColors.GRAY_600);
 
-        table.put("Button[focus].color", MaterialColors.BLACK);
+        table.put("CheckBox.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.BOLD));
+        table.put("CheckBox.background", MaterialColors.WHITE);
+        table.put("CheckBox.foreground", MaterialColors.BLACK);
+        table.put("CheckBox.disabledText", MaterialColors.COSMO_STRONG_GRAY);
+        table.put("CheckBox.icon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.UNCHECKED_BLACK_BOX)));
+        table.put("CheckBox.selectedIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.CHECKED_BLACK_BOX)));
 
-        table.put("CheckBox.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.BOLD));
-        table.put("CheckBox.background", Color.WHITE);
-        table.put("CheckBox.foreground", Color.BLACK);
-        table.put("CheckBox.icon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.UNCHECKED_BLACK_BOX)));
-        table.put("CheckBox.selectedIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.CHECKED_BLACK_BOX)));
-
-        table.put("ComboBox.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("ComboBox.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
         table.put("ComboBox.background", Color.WHITE);
         table.put("ComboBox.foreground", Color.BLACK);
         table.put("ComboBox.border", BorderFactory.createCompoundBorder(MaterialBorders.LIGHT_LINE_BORDER, BorderFactory.createEmptyBorder(0, 5, 0, 0)));
         table.put("ComboBox.buttonBackground", MaterialColors.GRAY_300);
+        table.put("ComboBox.disabledBackground", MaterialColors.GRAY_500);
+        table.put("ComboBox.disabledForeground", MaterialColors.GRAY_900);
         table.put("ComboBox.selectionBackground", Color.WHITE);
         table.put("ComboBox.selectionForeground", Color.BLACK);
         table.put("ComboBox.selectedInDropDownBackground", MaterialColors.GRAY_200);
         table.put("ComboBox.mouseHoverColor", MaterialColors.GRAY_400);
         table.put("ComboBox.mouseHoverEnabled", true);
 
-        table.put("Label.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
-        table.put("Label.background", Color.WHITE);
-        table.put("Label.foreground", Color.BLACK);
+        table.put("Label.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("Label.background", MaterialColors.WHITE);
+        table.put("Label.foreground", MaterialColors.BLACK);
+        table.put("Label.opaque", true);
+        table.put("Label[disabled].font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.ITALIC));
+        table.put("Label[disabled].background", MaterialColors.WHITE);
+        //table.put("Label[disabled].foreground", MaterialColors.COSMO_STRONG_GRAY);
+        table.put("Label.disabledForeground", MaterialColors.COSMO_STRONG_GRAY);
         table.put("Label.border", BorderFactory.createEmptyBorder());
 
-        table.put("Menu.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("Menu.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
         table.put("Menu.border", BorderFactory.createEmptyBorder(5, 5, 5, 5));
         table.put("Menu.background", Color.WHITE);
         table.put("Menu.foreground", Color.BLACK);
@@ -244,7 +261,7 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
         table.put("Menu.menuPopupOffsetY", 3);
         table.put("Menu[MouseOver].enable", true); //TODO adding into master
 
-        table.put("MenuBar.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.BOLD));
+        table.put("MenuBar.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.BOLD));
         table.put("MenuBar.background", Color.WHITE);
         table.put("MenuBar.border", MaterialBorders.LIGHT_SHADOW_BORDER);
         table.put("MenuBar.foreground", MaterialColors.BLACK);
@@ -252,12 +269,12 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
         table.put("MenuItem.disabledForeground", new Color(0, 0, 0, 100));
         table.put("MenuItem.selectionBackground", MaterialColors.GRAY_200);
         table.put("MenuItem.selectionForeground", Color.BLACK);
-        table.put("MenuItem.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.MEDIUM));
+        table.put("MenuItem.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.MEDIUM));
         table.put("MenuItem.background", Color.WHITE);
         table.put("MenuItem.foreground", Color.BLACK);
         table.put("MenuItem.border", BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        table.put("Panel.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("Panel.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
         table.put("Panel.background", Color.WHITE);
         table.put("Panel.border", BorderFactory.createEmptyBorder());
 
@@ -265,13 +282,14 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
         table.put("PopupMenu.background", Color.WHITE);
         table.put("PopupMenu.foreground", Color.BLACK);
 
-        table.put("RadioButton.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("RadioButton.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
         table.put("RadioButton.background", Color.WHITE);
         table.put("RadioButton.foreground", Color.BLACK);
-        table.put("RadioButton.icon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.RADIO_BUTTON_BLACK_OFF)));
-        table.put("RadioButton.selectedIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.RADIO_BUTTON_BLACK_ON)));
+        table.put("RadioButton.icon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.RADIO_BUTTON_BLACK_OFF)));
+        table.put("RadioButton.selectedIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.RADIO_BUTTON_BLACK_ON)));
+        table.put("RadioButton.disabledText", MaterialColors.COSMO_STRONG_GRAY);
 
-        table.put("Spinner.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("Spinner.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
         table.put("Spinner.background", Color.WHITE);
         table.put("Spinner.foreground", Color.BLACK);
         table.put("Spinner.border", MaterialBorders.LIGHT_LINE_BORDER);
@@ -280,7 +298,7 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
         table.put("Spinner.mouseHoverEnabled", true);
         table.put("Spinner.mouseHoverColor", MaterialColors.GRAY_400);
 
-        table.put("ScrollBar.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("ScrollBar.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
         table.put("ScrollBar.track", MaterialColors.GRAY_200);
         table.put("ScrollBar.thumb", MaterialColors.GRAY_500);
         table.put("ScrollBar.thumbDarkShadow", MaterialColors.GRAY_500);
@@ -293,23 +311,24 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
         table.put("ScrollBar[MouseHover].color", MaterialColors.GRAY_400);
         table.put("ScrollBar[OnClick].color", MaterialColors.GRAY_500);
 
-
         table.put("ScrollPane.background", Color.WHITE);
         table.put("ScrollPane.border", BorderFactory.createEmptyBorder());
-        table.put("ScrollPane.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("ScrollPane.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
 
-        table.put("Slider.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
-        table.put("Slider.background", Color.WHITE);
+        table.put("Slider.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("Slider.background", MaterialColors.WHITE);
         table.put("Slider.foreground", MaterialColors.LIGHT_BLUE_400);
-        table.put("Slider.trackColor", Color.BLACK);
+        table.put("Slider.trackColor", MaterialColors.BLACK);
+        table.put("Slider[halo].color", MaterialColors.bleach (MaterialColors.LIGHT_BLUE_400, 0.5f)); //TODO new fix
         table.put("Slider.border", BorderFactory.createCompoundBorder(MaterialBorders.LIGHT_LINE_BORDER, BorderFactory.createEmptyBorder(20, 20, 20, 20)));
 
         table.put("SplitPane.border", BorderFactory.createEmptyBorder());
         table.put("SplitPane.background", MaterialColors.WHITE);
         table.put("SplitPane.dividerSize", 5);
         table.put("SplitPaneDivider.border", BorderFactory.createEmptyBorder());
+        table.put("SplitPaneDivider.background",MaterialColors.WHITE);
 
-        table.put("TabbedPane.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("TabbedPane.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
         table.put("TabbedPane.background", Color.WHITE);
         table.put("TabbedPane.foreground", Color.BLACK);
         table.put("TabbedPane.border", BorderFactory.createEmptyBorder());
@@ -318,82 +337,90 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
         table.put("TabbedPane.highlight", MaterialColors.GRAY_200);
         table.put("TabbedPane.borderHighlightColor", MaterialColors.GRAY_300);
         table.put("TabbedPane[focus].colorLine", MaterialColors.COSMO_BLUE);
+        table.put("TabbedPane[MouseHover].enable",true);
 
         table.put("Table.selectionBackground", MaterialColors.GRAY_100);
         table.put("Table.selectionForeground", MaterialColors.BLACK);
         table.put("Table.background", MaterialColors.WHITE);
         table.put("Table.foreground", MaterialColors.BLACK);
-        table.put("Table.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("Table.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
         table.put("Table.border", MaterialBorders.LIGHT_LINE_BORDER);
         table.put("Table.gridColor", MaterialColors.GRAY_200);
         table.put("Table.focusable", false);
+        table.put("Table.opaque", false);
+        table.put("Table[row].height", 3);
+        table.put("Table[CheckBox].checked", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.CHECKED_BLACK_BOX)));
+        table.put("Table[CheckBox].unchecked", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.UNCHECKED_BLACK_BOX)));
+
         table.put("TableHeader.background", MaterialColors.GRAY_200);
-        table.put("TableHeader.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.BOLD));
+        table.put("TableHeader.foreground", MaterialColors.BLACK);
+        table.put("TableHeader.border", BorderFactory.createEmptyBorder());
+        table.put("TableHeader.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.BOLD));
         table.put("TableHeader.cellBorder", BorderFactory.createCompoundBorder(MaterialBorders.LIGHT_LINE_BORDER, BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         table.put("TextArea.background", MaterialColors.GRAY_200);
         table.put("TextArea.border", BorderFactory.createEmptyBorder());
         table.put("TextArea.foreground", Color.BLACK);
-        table.put("TextArea.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
-       /* table.put("TextArea.focusInputMap", multilineInputMap); //install shortcut
-
-        table.put("Password.focusInputMap", passwordInputMap); //install shortcut*/
+        table.put("TextArea.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
 
         table.put("ToggleButton.border", BorderFactory.createEmptyBorder());
-        table.put("ToggleButton.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("ToggleButton.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
         table.put("ToggleButton.background", MaterialColors.WHITE);
+        table.put("ToggleButton.select", MaterialColors.WHITE);
         table.put("ToggleButton.foreground", MaterialColors.BLACK);
-        table.put("ToggleButton.icon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.TOGGLE_BUTTON_OFF)));
-        table.put("ToggleButton.selectedIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.TOGGLE_BUTTON_ON)));
+        table.put("ToggleButton.disabledText", MaterialColors.COSMO_STRONG_GRAY);
+        table.put("ToggleButton.icon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.TOGGLE_BUTTON_BLACK_OFF)));
+        table.put("ToggleButton.selectedIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.TOGGLE_BUTTON_BLACK_ON)));
 
-        table.put("ToolBar.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("ToolBar.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
         table.put("ToolBar.background", Color.WHITE);
         table.put("ToolBar.foreground", Color.BLACK);
         table.put("ToolBar.border", MaterialBorders.LIGHT_SHADOW_BORDER);
         table.put("ToolBar.dockingBackground", MaterialColors.LIGHT_GREEN_A100);
         table.put("ToolBar.floatingBackground", MaterialColors.GRAY_200);
 
-        table.put("Tree.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("Tree.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
         table.put("Tree.selectionForeground", MaterialColors.BLACK);
         table.put("Tree.foreground", MaterialColors.BLACK);
         table.put("Tree.selectionBackground", MaterialColors.GRAY_200);
         table.put("Tree.background", MaterialColors.WHITE);
-        table.put("Tree.closedIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.RIGHT_ARROW)));
-        table.put("Tree.openIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.DOWN_ARROW)));
-        table.put("Tree.selectionBorderColor", null);
+        table.put("Tree.selectionBorderColor", MaterialColors.GRAY_200);
+        table.put("Tree.collapsedIcon", null);
+        table.put("Tree.expandedIcon", null);
+        table.put("Tree.closedIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.RIGHT_ARROW)));
+        table.put("Tree.openIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.DOWN_ARROW)));
+        table.put("Tree.leafIcon", null);
 
         table.put("RadioButtonMenuItem.foreground", MaterialColors.BLACK);
         table.put("RadioButtonMenuItem.selectionForeground", MaterialColors.BLACK);
-
-        //If it changes the background of the menuitem it must change this too, irrespective of its setting
         table.put("RadioButtonMenuItem.background", UIManager.getColor("MenuItem.background"));
         table.put("RadioButtonMenuItem.selectionBackground", MaterialColors.GRAY_200);
-        table.put("RadioButtonMenuItem.border", BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        table.put("RadioButtonMenuItem.checkIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.RADIO_BUTTON_BLACK_OFF)));
-        table.put("RadioButtonMenuItem.selectedCheckIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.RADIO_BUTTON_BLACK_ON)));
+        table.put("RadioButtonMenuItem.border", BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        table.put("RadioButtonMenuItem.checkIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.RADIO_BUTTON_BLACK_OFF)));
+        table.put("RadioButtonMenuItem.selectedCheckIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.RADIO_BUTTON_BLACK_ON)));
 
-        //If it changes the background of the menuitem it must change this too, irrespective of its setting
         table.put("CheckBoxMenuItem.background", UIManager.getColor("MenuItem.background"));
         table.put("CheckBoxMenuItem.selectionBackground", MaterialColors.GRAY_200);
         table.put("CheckBoxMenuItem.foreground", MaterialColors.BLACK);
         table.put("CheckBoxMenuItem.selectionForeground", MaterialColors.BLACK);
-        table.put("CheckBoxMenuItem.border", BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        table.put("CheckBoxMenuItem.checkIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.UNCHECKED_BLACK_BOX)));
-        table.put("CheckBoxMenuItem.selectedCheckIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.CHECKED_BLACK_BOX)));
+        table.put("CheckBoxMenuItem.border", BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        table.put("CheckBoxMenuItem.checkIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.UNCHECKED_BLACK_BOX)));
+        table.put("CheckBoxMenuItem.selectedCheckIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.CHECKED_BLACK_BOX)));
 
         table.put("TextPane.border", MaterialBorders.LIGHT_LINE_BORDER);
         table.put("TextPane.background", MaterialColors.GRAY_50);
+        table.put("TextPane.foreground", MaterialColors.BLACK);
         table.put("TextPane.selectionBackground", MaterialColors.LIGHT_BLUE_200);
         table.put("TextPane.inactiveForeground", MaterialColors.GRAY_500);
-        table.put("TextPane.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.ITALIC));
-        table.put("TextPane.focusInputMap", multilineInputMap); //instal shortcut
+        table.put("TextPane.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.ITALIC));
+        //table.put("TextPane.focusInputMap", multilineInputMap);
 
         table.put("EditorPane.border", MaterialBorders.LIGHT_LINE_BORDER);
         table.put("EditorPane.background", MaterialColors.GRAY_50);
         table.put("EditorPane.selectionBackground", MaterialColors.LIGHT_BLUE_200);
         table.put("EditorPane.inactiveForeground", MaterialColors.GRAY_500);
-        table.put("EditorPane.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
-        table.put("EditorPane.focusInputMap", multilineInputMap); //install shortcut
+        table.put("EditorPane.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
+        //table.put("EditorPane.focusInputMap", multilineInputMap);
 
         table.put("Separator.background", MaterialColors.GRAY_300);
         table.put("Separator.foreground", MaterialColors.GRAY_300);
@@ -402,46 +429,39 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
         table.put("ToolTip.foreground", MaterialColors.GRAY_50);
         table.put("ToolTip.border", BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
+        table.put("TextField.background", MaterialColors.GRAY_100);
+        table.put("TextField.foreground", MaterialColors.GRAY_800);
         table.put("TextField.inactiveForeground", MaterialColors.GRAY_800);
         table.put("TextField.inactiveBackground", MaterialColors.GRAY_200);
         table.put("TextField.selectionBackground", MaterialColors.LIGHT_BLUE_400);
         table.put("TextField.selectionForeground", MaterialColors.BLACK);
         table.put("TextField.border", BorderFactory.createEmptyBorder(3, 5, 2, 5));
-        table.put("TextField.focusInputMap", fieldInputMap); //install shortcut
+        //table.put("TextField.focusInputMap", fieldInputMap); //deprecated
 
+        table.put("PasswordField.background", MaterialColors.GRAY_100);
+        table.put("PasswordField.foreground", MaterialColors.BLACK);
         table.put("PasswordField.inactiveForeground", MaterialColors.GRAY_800);
         table.put("PasswordField.inactiveBackground", MaterialColors.GRAY_200);
         table.put("PasswordField.selectionBackground", MaterialColors.LIGHT_BLUE_400);
         table.put("PasswordField.selectionForeground", MaterialColors.BLACK);
         table.put("PasswordField.border", BorderFactory.createEmptyBorder(3, 5, 2, 5));
-        table.put("PasswordField.focusInputMap", fieldInputMap); //install shortcut
+        //table.put("PasswordField.focusInputMap", fieldInputMap);
 
-        table.put("TitledBorder.border",
-                new DropShadowBorder(MaterialColors.BLACK, 10, 4, (float) 0.2, 8,
-                        true, true, true, true));
-        table.put("TitledBorder.font", MaterialFonts.BOLD);
+        table.put("TitledBorder.border", MaterialBorders.LIGHT_LINE_BORDER);
+        table.put("TitledBorder.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.MEDIUM));
 
-        table.put("TaskPane.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.BOLD));
+        table.put("TaskPane.font",  MaterialFontFactory.getInstance().getFont(MaterialFontFactory.MEDIUM));
         table.put("TaskPane.titleBackgroundGradientStart", MaterialColors.GRAY_300);
         table.put("TaskPane.titleBackgroundGradientEnd", MaterialColors.GRAY_500);
         table.put("TaskPane.titleOver", MaterialColors.LIGHT_BLUE_500);
         table.put("TaskPane.specialTitleOver", MaterialColors.LIGHT_BLUE_500);
-        table.put("TaskPane.background", MaterialColors.LIGHT_BLUE_500);
+        table.put("TaskPane.background", MaterialColors.GRAY_300);
         table.put("TaskPane.foreground", MaterialColors.BLACK);
         table.put("TaskPane.borderColor", MaterialColors.LIGHT_BLUE_500);
         table.put("TaskPane.border", MaterialBorders.DEFAULT_SHADOW_BORDER);
         table.put("TaskPane.contentBackground", MaterialColors.GRAY_50);
-        table.put("TaskPane.yesCollassed", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.YES_COLLASSED)));
-        table.put("TaskPane.noCollassed", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.NO_COLLASSED)));
-
-        /*table.put("OptionPane.warningIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.WARNING)));
-        table.put("OptionPane.errorIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.ERROR)));
-        table.put("OptionPane.questionIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.QUESTION)));
-        table.put("OptionPane.informationIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.INFORMATION)));*/
-        table.put("OptionPane.background", Color.WHITE);
-        table.put("OptionPane.border", MaterialBorders.LIGHT_SHADOW_BORDER);
-        table.put("OptionPane.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.REGULAR));
-
+        table.put("TaskPane.yesCollapsed", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.YES_COLLAPSED)));
+        table.put("TaskPane.noCollapsed", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.NO_COLLAPSED)));
 
         table.put("FormattedTextField.inactiveForeground", MaterialColors.GRAY_800);
         table.put("FormattedTextField.inactiveBackground", MaterialColors.GRAY_200);
@@ -452,10 +472,66 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
         table.put("List.background", MaterialColors.WHITE);
         table.put("List.foreground", MaterialColors.BLACK);
         table.put("List.border", MaterialBorders.LIGHT_SHADOW_BORDER);
-        table.put("List.font", MaterialFontFactory.getIstance().getFont(MaterialFontFactory.MEDIUM));
+        table.put("List.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.MEDIUM));
         table.put("List.selectionBackground", MaterialColors.GRAY_400);
         table.put("List.selectionForeground", MaterialColors.BLACK);
-        table.put("List.focusable", false);
+        table.put("List.focusable", true);
+
+        table.put("RootPane.frameBorder", BorderFactory.createEmptyBorder());
+        table.put("RootPane.background", MaterialColors.WHITE);
+        table.put("RootPane.plainDialogBorder", MaterialBorders.LIGHT_SHADOW_BORDER);
+        table.put("RootPane.informationDialogBorder", MaterialBorders.LIGHT_SHADOW_BORDER);
+        table.put("RootPane.errorDialogBorder", MaterialBorders.LIGHT_SHADOW_BORDER);
+        table.put("RootPane.fileChooserDialogBorder", MaterialBorders.LIGHT_SHADOW_BORDER);
+        table.put("RootPane.questionDialogBorder", MaterialBorders.LIGHT_SHADOW_BORDER);
+        table.put("RootPane.warningDialogBorder", MaterialBorders.LIGHT_SHADOW_BORDER);
+        table.put("RootPane.colorChooserDialogBorder", MaterialColors.WHITE);
+
+        table.put("InternalFrame.maximizeIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.MAXIMIZE_WINDOWS)));
+        table.put("InternalFrame.minimizeIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.MINIIMIZE_WINDOWS)));
+        table.put("InternalFrame.closeIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.CLOSE_WINDOWS_BLACK)));
+        table.put("InternalFrame.iconifyIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.ICONIFY_WINDOWS)));
+        table.put("InternalFrame.activeTitleBackground", MaterialColors.COSMO_BLACK);
+        table.put("InternalFrame.activeTitleForeground", MaterialColors.BLACK);
+        table.put("InternalFrame.inactiveTitleBackground", MaterialColors.COSMO_BLACK);
+        table.put("InternalFrame.inactiveTitleForeground", MaterialColors.BLACK);
+        table.put("InternalFrame.titleFont", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.BOLD));
+
+        table.put("Material.activeCaption", MaterialColors.WHITE);
+        table.put("Material.inactiveCaption", MaterialColors.WHITE);
+        table.put("Material.activeCaptionText", MaterialColors.BLACK);
+        table.put("Material.inactiveCaptionText", MaterialColors.GRAY_700);
+        table.put("Material.activeCaptionBorder", MaterialColors.COSMO_STRONG_GRAY);
+        table.put("Material.inactiveCaptionBorder", MaterialColors.COSMO_STRONG_GRAY);
+
+        table.put("OptionPane.background", Color.WHITE);
+        table.put("OptionPane.border", BorderFactory.createEmptyBorder());
+        table.put("OptionPane.font", MaterialFontFactory.getInstance().getFont(MaterialFontFactory.REGULAR));
+        table.put("OptionPane.enableIcon", false);
+        table.put("OptionPaneUI.warningIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.WARNING)));
+        table.put("OptionPaneUI.errorIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.ERROR)));
+        table.put("OptionPaneUI.questionIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.QUESTION)));
+        table.put("OptionPaneUI.informationIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.INFORMATION)));
+        table.put("OptionPane.errorDialog.titlePane.background", MaterialColors.WHITE);
+        table.put("OptionPane.errorDialog.titlePane.foreground", MaterialColors.COSMO_BLACK);
+        table.put("OptionPane.errorDialog.titlePane.shadow", MaterialColors.COSMO_STRONG_GRAY);
+        table.put("OptionPane.questionDialog.titlePane.background", MaterialColors.WHITE);
+        table.put("OptionPane.questionDialog.titlePane.foreground", MaterialColors.COSMO_BLACK);
+        table.put("OptionPane.questionDialog.titlePane.shadow", MaterialColors.COSMO_STRONG_GRAY);
+        table.put("OptionPane.warningDialog.titlePane.background", MaterialColors.WHITE);
+        table.put("OptionPane.warningDialog.titlePane.foreground", MaterialColors.COSMO_BLACK);
+        table.put("OptionPane.warningDialog.titlePane.shadow", MaterialColors.COSMO_STRONG_GRAY);
+
+        table.put("FileChooser[icons].computer", new ImageIcon (MaterialImageFactory.getInstance().getImage(MaterialImageFactory.COMPUTER_BLACK)));
+        table.put("FileChooser[icons].directory", new ImageIcon (MaterialImageFactory.getInstance().getImage(MaterialImageFactory.FOLDER_BLACK)));
+        table.put("FileChooser[icons].file", new ImageIcon (MaterialImageFactory.getInstance().getImage(MaterialImageFactory.FILE_BLACK)));
+        table.put("FileChooser[icons].floppyDrive", new ImageIcon (MaterialImageFactory.getInstance().getImage(MaterialImageFactory.FLOPPY_DRIVE_BLACK)));
+        table.put("FileChooser[icons].hardDrive", new ImageIcon (MaterialImageFactory.getInstance().getImage(MaterialImageFactory.HARD_DRIVE_BLACK)));
+        table.put("FileChooser[icons].home", new ImageIcon (MaterialImageFactory.getInstance().getImage(MaterialImageFactory.HOME_BLACK)));
+        table.put("FileChooser[icons].list", new ImageIcon (MaterialImageFactory.getInstance().getImage(MaterialImageFactory.LIST_BLACK)));
+        table.put("FileChooser[icons].details", new ImageIcon (MaterialImageFactory.getInstance().getImage(MaterialImageFactory.DETAILS_BLACK)));
+        table.put("FileChooser[icons].newFolder", new ImageIcon (MaterialImageFactory.getInstance().getImage(MaterialImageFactory.NEW_FOLDER_BLACK)));
+        table.put("FileChooser[icons].upFolder", new ImageIcon (MaterialImageFactory.getInstance().getImage(MaterialImageFactory.BACK_ARROW_BLACK)));
 
     }
 
@@ -467,18 +543,29 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
             final UIDefaults defaults = (UIDefaults)superMethod.invoke(basicLookAndFeel);
             initClassDefaults(defaults);
             initComponentDefaults(defaults);
-            defaults.put("OptionPane.warningIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.WARNING)));
-            defaults.put("OptionPane.errorIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.ERROR)));
-            defaults.put("OptionPane.questionIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.QUESTION)));
-            defaults.put("OptionPane.informationIcon", new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.INFORMATION)));
+            defaults.put("OptionPane.warningIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.WARNING)));
+            defaults.put("OptionPane.errorIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.ERROR)));
+            defaults.put("OptionPane.questionIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.QUESTION)));
+            defaults.put("OptionPane.informationIcon", new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.INFORMATION)));
             return defaults;
         }
         catch (Exception ignore) {
+            //do nothing
+            ignore.printStackTrace();
         }
         return super.getDefaults();
     }
 
+    public static int getFocusAcceleratorKeyMask() {
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        if (tk instanceof SunToolkit) {
+            return ((SunToolkit)tk).getFocusAcceleratorKeyMask();
+        }
+        return ActionEvent.ALT_MASK;
+    }
+
     /*Shortcut for filed input*/
+    @Deprecated
     Object fieldInputMap = new UIDefaults.LazyInputMap(new Object[]{
             "ctrl C", DefaultEditorKit.copyAction,
             "ctrl V", DefaultEditorKit.pasteAction,
@@ -521,48 +608,9 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
             "control shift O", "toggle-componentOrientation"/*DefaultEditorKit.toggleComponentOrientation*/
     });
 
-    /*Shortcut for password input*/
-    Object passwordInputMap = new UIDefaults.LazyInputMap(new Object[]{
-            "ctrl C", DefaultEditorKit.copyAction,
-            "ctrl V", DefaultEditorKit.pasteAction,
-            "ctrl X", DefaultEditorKit.cutAction,
-            "COPY", DefaultEditorKit.copyAction,
-            "PASTE", DefaultEditorKit.pasteAction,
-            "CUT", DefaultEditorKit.cutAction,
-            "control INSERT", DefaultEditorKit.copyAction,
-            "shift INSERT", DefaultEditorKit.pasteAction,
-            "shift DELETE", DefaultEditorKit.cutAction,
-            "shift LEFT", DefaultEditorKit.selectionBackwardAction,
-            "shift KP_LEFT", DefaultEditorKit.selectionBackwardAction,
-            "shift RIGHT", DefaultEditorKit.selectionForwardAction,
-            "shift KP_RIGHT", DefaultEditorKit.selectionForwardAction,
-            "ctrl LEFT", DefaultEditorKit.beginLineAction,
-            "ctrl KP_LEFT", DefaultEditorKit.beginLineAction,
-            "ctrl RIGHT", DefaultEditorKit.endLineAction,
-            "ctrl KP_RIGHT", DefaultEditorKit.endLineAction,
-            "ctrl shift LEFT", DefaultEditorKit.selectionBeginLineAction,
-            "ctrl shift KP_LEFT", DefaultEditorKit.selectionBeginLineAction,
-            "ctrl shift RIGHT", DefaultEditorKit.selectionEndLineAction,
-            "ctrl shift KP_RIGHT", DefaultEditorKit.selectionEndLineAction,
-            "ctrl A", DefaultEditorKit.selectAllAction,
-            "HOME", DefaultEditorKit.beginLineAction,
-            "END", DefaultEditorKit.endLineAction,
-            "shift HOME", DefaultEditorKit.selectionBeginLineAction,
-            "shift END", DefaultEditorKit.selectionEndLineAction,
-            "BACK_SPACE", DefaultEditorKit.deletePrevCharAction,
-            "shift BACK_SPACE", DefaultEditorKit.deletePrevCharAction,
-            "ctrl H", DefaultEditorKit.deletePrevCharAction,
-            "DELETE", DefaultEditorKit.deleteNextCharAction,
-            "RIGHT", DefaultEditorKit.forwardAction,
-            "LEFT", DefaultEditorKit.backwardAction,
-            "KP_RIGHT", DefaultEditorKit.forwardAction,
-            "KP_LEFT", DefaultEditorKit.backwardAction,
-            "ENTER", JTextField.notifyAction,
-            "ctrl BACK_SLASH", "unselect"/*DefaultEditorKit.unselectAction*/,
-            "control shift O", "toggle-componentOrientation"/*DefaultEditorKit.toggleComponentOrientation*/
-    });
 
     /*Shortcut for multiline input*/
+    @Deprecated
     Object multilineInputMap = new UIDefaults.LazyInputMap(new Object[]{
             "ctrl C", DefaultEditorKit.copyAction,
             "ctrl V", DefaultEditorKit.pasteAction,
@@ -627,4 +675,5 @@ public class MaterialLookAndFeel extends MetalLookAndFeel {
             "ctrl SPACE", "activate-link-action",
             "control shift O", "toggle-componentOrientation"/*DefaultEditorKit.toggleComponentOrientation*/
     });
+
 }

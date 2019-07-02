@@ -37,41 +37,62 @@ public class MaterialImageFactory {
 
     private static MaterialImageFactory SINGLETON;
 
-    public static final String RIGHT_ARROW = "/resources/imgs/right_arrow.png";
-    public static final String LEFT_ARROW = "/resources/imgs/left_arrow.png";
-    public static final String DOWN_ARROW = "/resources/imgs/down_arrow.png";
-    public static final String UP_ARROW = "/resources/imgs/up_arrow.png";
-    public static final String CHECKED_BLACK_BOX = "/resources/imgs/painted_checked_box.png";
-    public static final String CHECKED_WHITE_BOX = "/resources/imgs/checked_white.png";
-    public static final String OUTLINED_CHECKED_BOX = "/resources/imgs/outlined_checked_box.png";
-    public static final String UNCHECKED_BLACK_BOX = "/resources/imgs/unchecked_box.png";
-    public static final String UNCHECKED_WHITE_BOX = "/resources/imgs/unchecked_white.png";
-    public static final String RADIO_BUTTON_BLACK_ON = "/resources/imgs/radio_button_on.png";
-    public static final String RADIO_BUTTON_WHITE_ON = "/resources/imgs/radio-checked-white.png";
-    public static final String RADIO_BUTTON_BLACK_OFF = "/resources/imgs/radio_button_off.png";
-    public static final String RADIO_BUTTON_WHITE_OFF = "/resources/imgs/radio_unchecked-white.png";
-    public static final String TOGGLE_BUTTON_ON = "/resources/imgs/toggle_on.png";
-    public static final String TOGGLE_BUTTON_OFF = "/resources/imgs/toggle_off.png";
-    public static final String BACK_ARROW = "/resources/imgs/back_arrow.png";
-    public static final String COMPUTER = "/resources/imgs/computer.png";
-    public static final String FILE = "/resources/imgs/file.png";
-    public static final String FLOPPY_DRIVE = "/resources/imgs/floppy_drive.png";
-    public static final String FOLDER = "/resources/imgs/folder.png";
-    public static final String HARD_DRIVE = "/resources/imgs/hard_drive.png";
-    public static final String HOME = "/resources/imgs/home.png";
-    public static final String LIST = "/resources/imgs/list.png";
-    public static final String NEW_FOLDER = "/resources/imgs/new_folder.png";
-    public static final String DETAILS = "/resources/imgs/details.png";
-    public static final String YES_COLLASSED = "/resources/imgs/yes-collassed.png";
-    public static final String NO_COLLASSED = "/resources/imgs/no-collassed.png";
+    private static final String PATH_RESOUSES = "/resources/imgs";
+
+    //Icon black
+    public static final String RIGHT_ARROW = PATH_RESOUSES + "/right_arrow.png";
+    public static final String LEFT_ARROW = PATH_RESOUSES + "/left_arrow.png";
+    public static final String DOWN_ARROW = PATH_RESOUSES + "/down_arrow.png";
+    public static final String UP_ARROW = PATH_RESOUSES + "/up_arrow.png";
+    public static final String CHECKED_BLACK_BOX = PATH_RESOUSES + "/painted_checked_box.png";
+    public static final String UNCHECKED_BLACK_BOX = PATH_RESOUSES + "/unchecked_box.png";
+    public static final String RADIO_BUTTON_BLACK_ON = PATH_RESOUSES + "/radio_button_on.png";
+    public static final String RADIO_BUTTON_BLACK_OFF = PATH_RESOUSES + "/radio_button_off.png";
+    public static final String TOGGLE_BUTTON_BLACK_ON = PATH_RESOUSES + "/toggle_on.png";
+    public static final String TOGGLE_BUTTON_BLACK_OFF = PATH_RESOUSES + "/toggle_off.png";
+    public static final String BACK_ARROW_BLACK = "/resources/imgs/back_arrow.png";
+    public static final String COMPUTER_BLACK = "/resources/imgs/computer.png";
+    public static final String FILE_BLACK = "/resources/imgs/file.png";
+    public static final String FLOPPY_DRIVE_BLACK = "/resources/imgs/floppy_drive.png";
+    public static final String FOLDER_BLACK = "/resources/imgs/folder.png";
+    public static final String HARD_DRIVE_BLACK = "/resources/imgs/hard_drive.png";
+    public static final String HOME_BLACK = "/resources/imgs/home.png";
+    public static final String LIST_BLACK = "/resources/imgs/list.png";
+    public static final String NEW_FOLDER_BLACK = "/resources/imgs/new_folder.png";
+    public static final String DETAILS_BLACK = "/resources/imgs/details.png";
+    public static final String YES_COLLAPSED = "/resources/imgs/yes-collapsed.png";
+    public static final String NO_COLLAPSED = "/resources/imgs/no-collapsed.png";
     public static final String ERROR = "/resources/imgs/error.png";
     public static final String WARNING = "/resources/imgs/warning.png";
     public static final String QUESTION = "/resources/imgs/question.png";
     public static final String INFORMATION = "/resources/imgs/information.png";
+    public static final String CLOSE_WINDOWS_BLACK = "/resources/imgs/close-button.png";
+    public static final String MAXIMIZE_WINDOWS = "/resources/imgs/maximize.png";
+    public static final String MINIIMIZE_WINDOWS = "/resources/imgs/minimize.png";
+    public static final String ICONIFY_WINDOWS = "/resources/imgs/restore.png";
+
+    //Icon White
+    public static final String RADIO_BUTTON_WHITE_OFF = "/resources/imgs/white/radio_unchecked-white.png";
+    public static final String CHECKED_WHITE_BOX = "/resources/imgs/white/checked_white.png";
+    public static final String RADIO_BUTTON_WHITE_ON = "/resources/imgs/white/radio-checked-white.png";
+    public static final String UNCHECKED_WHITE_BOX = "/resources/imgs/white/unchecked_white.png";
+    public static final String BACK_ARROW_WHITE = "/resources/imgs/white/back_arrow.png";
+    public static final String COMPUTER_WHITE = "/resources/imgs/white/computer.png";
+    public static final String FILE_WHITE = "/resources/imgs/white/file.png";
+    public static final String FLOPPY_DRIVE_WHITE = "/resources/imgs/white/floppy_drive.png";
+    public static final String FOLDER_WHITE = "/resources/imgs/white/folder.png";
+    public static final String HARD_DRIVE_WHITE = "/resources/imgs/white/hard_drive.png";
+    public static final String HOME_WHITE = "/resources/imgs/white/home.png";
+    public static final String LIST_WHITE = "/resources/imgs/white/list.png";
+    public static final String NEW_FOLDER_WHITE = "/resources/imgs/white/new_folder.png";
+    public static final String DETAILS_WHITE = "/resources/imgs/white/details.png";
+    public static final String CLOSE_WINDOWS_WHITE = "/resources/imgs/white/close-button.png";
+    public static final String TOGGLE_BUTTON_ON_WHITE = PATH_RESOUSES + "/white/toggle_on.png";
+    public static final String TOGGLE_BUTTON_OFF_WHITE = PATH_RESOUSES + "/white/toggle_off.png";
 
     private Map<String, BufferedImage> cachaImage = new HashMap<>();
 
-    public static MaterialImageFactory getIstance() {
+    public static MaterialImageFactory getInstance() {
         if (SINGLETON == null) {
             SINGLETON = new MaterialImageFactory();
         }
@@ -88,7 +109,7 @@ public class MaterialImageFactory {
         if (cachaImage.containsKey(key)) {
             return cachaImage.get(key);
         }
-        try (InputStream inputStream = MaterialImages.class.getResourceAsStream(key)) {
+        try (InputStream inputStream = MaterialImageFactory.class.getResourceAsStream(key)) {
             BufferedImage image = ImageIO.read(inputStream);
             cachaImage.put(key, image);
             return cachaImage.get(key);

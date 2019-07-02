@@ -1,7 +1,10 @@
 package mdlaf.components.taskpane;
 
+import mdlaf.utils.MaterialColors;
 import mdlaf.utils.MaterialDrawingUtils;
+import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXTaskPane;
+import org.jdesktop.swingx.plaf.TaskPaneUI;
 import org.jdesktop.swingx.plaf.basic.BasicTaskPaneUI;
 
 import javax.swing.*;
@@ -30,11 +33,17 @@ public class MaterialTaskPaneUI extends BasicTaskPaneUI {
         super.installUI(c);
         JXTaskPane jxTaskPane = (JXTaskPane) c;
         jxTaskPane.addMouseListener(new ChangeIconOnClick(jxTaskPane));
-        jxTaskPane.setIcon(jxTaskPane.isCollapsed() ? UIManager.getIcon("TaskPane.yesCollassed") : UIManager.getIcon("TaskPane.noCollassed"));
+        jxTaskPane.setIcon(jxTaskPane.isCollapsed() ? UIManager.getIcon("TaskPane.yesCollapsed") : UIManager.getIcon("TaskPane.noCollapsed"));
         jxTaskPane.getContentPane().setBackground(UIManager.getColor("TaskPane.contentBackground"));
     }
 
-
+    @Override
+    public void update(Graphics g, JComponent c) {
+        super.update(g, c);
+        JXTaskPane jxTaskPane = (JXTaskPane) c;
+        jxTaskPane.setIcon(jxTaskPane.isCollapsed() ? UIManager.getIcon("TaskPane.yesCollapsed") : UIManager.getIcon("TaskPane.noCollapsed"));
+        jxTaskPane.getContentPane().setBackground(UIManager.getColor("TaskPane.contentBackground"));
+    }
 
     protected void installDefaults() {
         LookAndFeel.installColorsAndFont(group, "TaskPane.background",
@@ -73,16 +82,21 @@ public class MaterialTaskPaneUI extends BasicTaskPaneUI {
         super.paint(MaterialDrawingUtils.getAliasedGraphics(g), c);
     }
 
+
     protected class MaterialPaneBorder extends PaneBorder{
 
         protected void paintTitleBackground(JXTaskPane group, Graphics g) {
             MaterialDrawingUtils.getAliasedGraphics(g);
+            this.label.setBackground(UIManager.getColor("TaskPane.background"));
             if (group.isSpecial()) {
                 g.setColor(specialTitleBackground);
             } else {
                 g.setColor(titleBackgroundGradientStart);
             }
-            g.fillRoundRect(0, 0, group.getWidth(), getTitleHeight(group) -1 , 15, 15);
+            Graphics2D graphics2D = (Graphics2D) g;
+            graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g = graphics2D;
+            g.fillRoundRect( -2, 0, group.getWidth(), group.getHeight(), 15, 15);
         }
 
         @Override
@@ -94,14 +108,22 @@ public class MaterialTaskPaneUI extends BasicTaskPaneUI {
         public boolean isBorderOpaque() {
             return true;
         }
+
+        @Override
+        public Dimension getPreferredSize(JXTaskPane group) {
+            this.configureLabel(group);
+            Dimension dim = this.label.getPreferredSize();
+            dim.width += getTitleHeight(group);
+            dim.height = getTitleHeight(group);
+            return dim;
+        }
     }
 
     /**
-     * Action change icon on clic
-     * @author @author https://github.com/vincenzopalazzo
+     * Action change icon on click
+     * @author https://github.com/vincenzopalazzo
      */
-
-    private class ChangeIconOnClick implements MouseListener {
+    protected class ChangeIconOnClick implements MouseListener {
 
         JXTaskPane taskPane;
 
@@ -113,10 +135,10 @@ public class MaterialTaskPaneUI extends BasicTaskPaneUI {
         @Override
         public void mouseClicked(MouseEvent e) {
             if(taskPane.isCollapsed()){
-                taskPane.setIcon(UIManager.getIcon("TaskPane.yesCollassed"));
+                taskPane.setIcon(UIManager.getIcon("TaskPane.yesCollapsed"));
                 return;
             }
-            taskPane.setIcon(UIManager.getIcon("TaskPane.noCollassed"));
+            taskPane.setIcon(UIManager.getIcon("TaskPane.noCollapsed"));
         }
 
         @Override

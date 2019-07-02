@@ -2,9 +2,8 @@ import mdlaf.MaterialLookAndFeel;
 import mdlaf.animation.MaterialUIMovement;
 import mdlaf.utils.MaterialColors;
 import mdlaf.utils.MaterialImageFactory;
+import mdlaf.utils.MaterialManagerListener;
 import org.jdesktop.swingx.JXTaskPane;
-import top.gigabox.supportcomponent.toast.MaterialTost;
-
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -22,18 +21,20 @@ public class MaterialUISwingDemo {
 
     public static void main(String[] args) {
         try {
+            JDialog.setDefaultLookAndFeelDecorated(true);
+            JFrame.setDefaultLookAndFeelDecorated(false);
             UIManager.setLookAndFeel(new MaterialLookAndFeel());
         } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
 
-        // basic instantiation of JFrame with various components, including a
-        // JMenuBar with some menus and items, as well as a button
         JFrame frame = new JFrame("Material Design UI for Swing by atharva washimkar");
         frame.setMinimumSize(new Dimension(600, 400));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // configuring the JMenuBar as well as its menus and items
+        //Test for fix the issue https://github.com/vincenzopalazzo/material-ui-swing/projects/1#card-21599924
+        //frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
         JMenuBar bar = new JMenuBar();
         JMenu menu1 = new JMenu("Option 1 (Animated)");
         JMenu menu2 = new JMenu("Option 2 (Not animated)");
@@ -71,17 +72,56 @@ public class MaterialUISwingDemo {
         menu1.add(item1);
         menu2.add(item2);
 
+        JMenuItem menuItemTestUno = new JMenuItem("Test distance");
+        JMenuItem menuItemTestDue = new JMenuItem("Test distance");
+        JMenuItem menuItemExit = new JMenuItem("Exit");
+
+        menu1.addSeparator();
+        menu1.add(menuItemExit);
+
+        menu2.add(menuItemTestUno);
+        menu2.add(checkBoxMenuItem);
+        menu2.add(menuItemTestDue);
+        menu2.add(jRadioButtonMenuItem);
+
         bar.add(menu1);
         bar.add(menu2);
 
         // configuring a simple JButton
-        JButton button = new JButton("PRESS ME");
-        button.setBackground(MaterialColors.LIGHT_BLUE_400);
-        button.setForeground(Color.WHITE);
-        button.setMaximumSize(new Dimension(200, 200));
-
+        JButton button = new JButton("I'm Disabled");
+        button.setEnabled(false);
         JPanel content = new JPanel();
         content.add(button);
+
+
+
+        class ActionEnableButton extends AbstractAction{
+
+            private JButton button;
+
+            public ActionEnableButton(JButton button) {
+                putValue(Action.NAME, "I can enable");
+                this.button = button;
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(button.isEnabled()){
+                    button.setEnabled(false);
+                    button.setText("I'm disable");
+                }else{
+                    button.setEnabled(true);
+                    button.setText("I'm enable");
+                }
+            }
+        }
+
+        JButton abiliteButton = new JButton("I can enable");
+        abiliteButton.setAction(new ActionEnableButton(button));
+        abiliteButton.setBackground(MaterialColors.COSMO_BLUE);
+        abiliteButton.setForeground(MaterialColors.WHITE);
+        abiliteButton.addMouseListener(MaterialUIMovement.getMovement(abiliteButton, MaterialColors.COSMO_LIGTH_BLUE));
+        content.add(abiliteButton);
 
         //Test a MaterialTitleBorder
         TitledBorder materialTitleBorder = new TitledBorder("Test Border");
@@ -154,7 +194,6 @@ public class MaterialUISwingDemo {
         tree.setEditable(true);
 
         content.add(tree);
-
         JScrollPane sp = new JScrollPane(content);
         sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -205,7 +244,11 @@ public class MaterialUISwingDemo {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                MaterialTost.makeText(frame, "This is a message in a toast component", MaterialTost.SHORT, MaterialTost.NORMAL, MaterialTost.BOTTOM).display();
+               JOptionPane pane = new JOptionPane();
+               String message = "The componet toast is removed into project \n " +
+                       "Because it carried unnecessary dependencies, but you can find the component here\n" +
+                       "https://github.com/vincenzopalazzo/toasts-for-swing";
+               pane.showMessageDialog(frame, message, "Info on Toast", JOptionPane.INFORMATION_MESSAGE);
             }
         }
         buttonTwoo.setAction(new ActionToastTest(pn));
@@ -215,7 +258,7 @@ public class MaterialUISwingDemo {
         pn.add(buttonTwoo);
 
         JButton bottoneConImmagine = new JButton();
-        bottoneConImmagine.setIcon(new ImageIcon(MaterialImageFactory.getIstance().getImage(MaterialImageFactory.COMPUTER)));
+        bottoneConImmagine.setIcon(new ImageIcon(MaterialImageFactory.getInstance().getImage(MaterialImageFactory.COMPUTER_BLACK)));
         pn.add(bottoneConImmagine);
 
         JButton buttonTestTextFieled = new JButton("Test JtexFiele");
@@ -245,7 +288,6 @@ public class MaterialUISwingDemo {
         JXTaskPane jxTaskPane = new JXTaskPane();
         jxTaskPane.setTitle("Material UI memory");
         jxTaskPane.setOpaque(false);
-
         JLabel memoryOccupedNow = new JLabel();
 
         jxTaskPane.add(memoryOccupedNow);
@@ -346,6 +388,8 @@ public class MaterialUISwingDemo {
 
         buttonQuestion.setAction(new QuesuionMessage());
 
+        frame.getRootPane().setDefaultButton(buttonQuestion);
+
         JButton buttonWarning = new JButton();
         buttonWarning.setOpaque(false);
         buttonWarning.setForeground(MaterialColors.COSMO_LIGTH_GRAY);
@@ -410,8 +454,47 @@ public class MaterialUISwingDemo {
         panel4.add(buttonOptionPane);
         panel4.add(listDay);
 
-        tp.addTab("Panel 4", panel4);
+        //Test label disable
+        JLabel labelDisable = new JLabel("I'm disabled");
+        panel4.add(labelDisable);
+        labelDisable.setEnabled(false);
 
+        JButton buttonEnableLabel = new JButton("Enable lable");
+        buttonEnableLabel.setBackground(MaterialColors.COSMO_BLACK);
+        buttonEnableLabel.setForeground(MaterialColors.COSMO_LIGTH_GRAY);
+
+        MaterialManagerListener.removeAllMaterialMouseListener(buttonEnableLabel);
+        buttonEnableLabel.addMouseListener(MaterialUIMovement.getMovement(buttonEnableLabel, MaterialColors.COSMO_DARK_GRAY));
+
+        class ActionEnableLabel extends AbstractAction{
+
+            public ActionEnableLabel() {
+                putValue(Action.NAME, "Enable label");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(labelDisable.isEnabled()){
+                    labelDisable.setEnabled(false);
+                    return;
+                }
+                labelDisable.setEnabled(true);
+            }
+        }
+
+        buttonEnableLabel.setAction(new ActionEnableLabel());
+
+        panel4.add(buttonEnableLabel);
+
+        JCheckBox disabledCheckBox = new JCheckBox("I'm Disabled");
+        disabledCheckBox.setEnabled(false);
+        panel4.add(disabledCheckBox);
+
+        JRadioButton radioDisabled = new JRadioButton("radio disabled");
+        radioDisabled.setEnabled(false);
+        panel4.add(radioDisabled);
+
+        tp.addTab("Panel 4", panel4);
         frame.pack();
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
@@ -419,5 +502,8 @@ public class MaterialUISwingDemo {
         long lastUsedMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         double megamemori = (lastUsedMem - beforeUsedMem) * 9.537 * Math.pow(10, -7);
         memoryOccupedNow.setText("Memory occuped after update: " + megamemori + " MB");
+
+        //For testing
+        //SwingUtilities.updateComponentTreeUI(frame);
     }
 }
